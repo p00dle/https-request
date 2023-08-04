@@ -10,5 +10,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "exclude": ["*.spec.*", "./tests", "vitest.config.ts", "prisma"]
+  "exclude": ["*.spec.*", "dist", "vitest.config.ts"]
 }
