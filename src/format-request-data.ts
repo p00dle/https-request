@@ -1,6 +1,6 @@
 import type { Readable } from 'node:stream';
 import type { HttpsRequestType } from './types/DataType';
-import type { FormData } from './types/FormData';
+import type { FormParams } from './types/FormParams';
 
 import { URLSearchParams } from 'node:url';
 import { createReadableStream } from './lib/stream';
@@ -10,9 +10,9 @@ function jsonFormatter(json: any): [Readable, number, string] {
   return [createReadableStream(data), Buffer.byteLength(data), 'application/json'];
 }
 
-function formFormatter(formData: FormData): [Readable, number, string] {
+function formFormatter(formParams: FormParams): [Readable, number, string] {
   const searchParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(formData)) {
+  for (const [key, value] of Object.entries(formParams)) {
     if (Array.isArray(value)) {
       value.forEach((val) => searchParams.append(key, val));
     } else {
