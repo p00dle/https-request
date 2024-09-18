@@ -12,11 +12,11 @@ function stringHasControlOrNonAsciiCharacter(str: string): boolean {
 }
 
 function keyHasInvalidCharacters(str: string): boolean {
-  return /[ \t\(\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}]/.test(str) || stringHasControlOrNonAsciiCharacter(str);
+  return /[ \t()<>@,;:\\"/[\]?={}]/.test(str) || stringHasControlOrNonAsciiCharacter(str);
 }
 
 function valueHasInvalidCharacters(str: string): boolean {
-  return /[\s\"\,\;\\]/.test(str) || stringHasControlOrNonAsciiCharacter(str);
+  return /[\s",;\\]/.test(str) || stringHasControlOrNonAsciiCharacter(str);
 }
 
 export function validateCookie(hostUrl: URL, cookie: Cookie): boolean {

@@ -2,7 +2,7 @@ import * as https from 'node:https';
 import * as http from 'node:http';
 import { Duplex } from 'node:stream';
 type HttpMethod = 'GET' | 'POST';
-type Unsubscribe = () => any;
+type Unsubscribe = () => void;
 
 const HTTPS_TEST_SERVER_CERT = `-----BEGIN CERTIFICATE-----
 MIIDwzCCAqsCFAuyUqdj6qSjuYegrMQQbQOoJTNLMA0GCSqGSIb3DQEBCwUAMIGc
@@ -119,6 +119,7 @@ export class HttpsTestServer {
     }
     this.pathHandlers[method][path] = handler;
     return () => {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete this.pathHandlers[method][path];
     };
   }

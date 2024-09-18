@@ -9,7 +9,7 @@ export type HttpsRequestData<T extends HttpsRequestType | undefined> = T extends
   : T extends 'form'
   ? FormParams
   : T extends 'json'
-  ? any
+  ? unknown
   : T extends 'string'
   ? string
   : T extends 'stream'

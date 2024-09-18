@@ -15,7 +15,7 @@ export function nodeHttpsRequestWrapper(url: URL, options: RequestOptions, dataS
       settled = true;
       resolve(response);
     }
-    function rejectWrapper(error: any) {
+    function rejectWrapper(error: unknown) {
       if (settled) return;
       settled = true;
       if (!request.destroyed) {

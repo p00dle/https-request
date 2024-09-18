@@ -48,7 +48,7 @@ export function collectStreamToString(stream: Readable): Promise<string> {
   );
 }
 
-export function createReportStream(onDataChunk: (size: number) => any): Duplex {
+export function createReportStream(onDataChunk: (size: number) => unknown): Duplex {
   return new Duplex({
     write(chunk, encoding, done) {
       onDataChunk(Buffer.byteLength(chunk));

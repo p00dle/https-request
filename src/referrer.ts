@@ -37,7 +37,7 @@ function makeReferrer(url: URL, fullUrl: boolean): string {
   return fullUrl ? url.toString() : url.origin;
 }
 
-type Options = { headers?: Record<string, any> };
+type Options = { headers?: Record<string, unknown> };
 export function applyReferrerHeader(policy: ReferrerPolicy, url: URL, newUrl: URL, options: Options): void {
   const referrer = getReferrer(policy, url, newUrl);
   if (!referrer) return;

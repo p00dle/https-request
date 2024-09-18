@@ -6,7 +6,7 @@ import type { GetHttpsResponseOptions } from './GetHttpsResponseOptions';
 export type HttpsRequestOptions<
   T extends HttpsRequestType | undefined,
   R extends HttpsResponseType | undefined,
-  J = any
+  J = unknown
 > = Omit<GetHttpsResponseOptions, 'dataStream'> & {
   url: string | URL;
   dataType?: T;
@@ -15,7 +15,7 @@ export type HttpsRequestOptions<
   validateJson?: (json: unknown) => json is J;
   validateHttpStatus?: number | ((statusCode?: number) => boolean);
   _request?: NodeHttpsRequestWrapper;
-  onContentLength?: (size: number) => any;
-  onDataChunk?: (size: number) => any;
+  onContentLength?: (size: number) => unknown;
+  onDataChunk?: (size: number) => unknown;
   disableDecompression?: boolean;
 };
