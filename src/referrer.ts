@@ -1,5 +1,7 @@
-import { IncomingMessage } from 'node:http';
+import type { IncomingMessage, OutgoingHttpHeaders } from 'node:http';
 import type { URL } from 'node:url';
+import { errors } from './errors';
+import { applyHeader } from './lib/applyHeader';
 import type { ReferrerPolicy } from './types/ReferrerPolicy';
 
 /*
@@ -37,17 +39,16 @@ function makeReferrer(url: URL, fullUrl: boolean): string {
   return fullUrl ? url.toString() : url.origin;
 }
 
-type Options = { headers?: Record<string, unknown> };
-export function applyReferrerHeader(policy: ReferrerPolicy, url: URL, newUrl: URL, options: Options): void {
-  const referrer = getReferrer(policy, url, newUrl);
+export function applyReferrerHeader(policy: ReferrerPolicy, previousUrl: URL | null, url: URL, headers: OutgoingHttpHeaders): void {
+  if (!previousUrl) return;
+  const referrer = getReferrer(policy, url, previousUrl);
   if (!referrer) return;
-  if (!options.headers) options.headers = {};
-  options.headers.referer = referrer;
+  applyHeader(headers, 'referer', referrer, false);
 }
 
-export function getReferrer(policy: ReferrerPolicy, url: URL, newUrl: URL): string | null {
-  const protocolDowngrade = isProtocolDowngrade(url, newUrl);
-  const sameOrigin = isSameOrigin(url, newUrl);
+export function getReferrer(policy: ReferrerPolicy, previousUrl: URL, url: URL): string | null {
+  const protocolDowngrade = isProtocolDowngrade(previousUrl, url);
+  const sameOrigin = isSameOrigin(previousUrl, url);
   switch (policy) {
     case 'no-referrer':
       return null;
@@ -74,7 +75,7 @@ export function getReferrer(policy: ReferrerPolicy, url: URL, newUrl: URL): stri
       return makeReferrer(url, true);
 
     default:
-      throw new Error(`Invalid referrer policy: ${policy}`);
+      throw new errors.ResponseInvalidReferrerPolicy(`Invalid referrer policy: ${policy}`);
   }
 }
 

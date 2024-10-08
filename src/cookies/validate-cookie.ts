@@ -1,4 +1,4 @@
-import { Cookie } from '../types/Cookie';
+import type { Cookie } from '../types/Cookie';
 import { matchDomain } from './match-domain';
 
 function stringHasControlOrNonAsciiCharacter(str: string): boolean {
@@ -22,7 +22,7 @@ function valueHasInvalidCharacters(str: string): boolean {
 export function validateCookie(hostUrl: URL, cookie: Cookie): boolean {
   if (!cookie.isValid) return false;
   if (!['Strict', 'Lax', 'None'].includes(cookie.sameSite)) return false;
-  if (cookie.expires !== null && isNaN(cookie.expires)) return false;
+  if (cookie.expires !== null && Number.isNaN(cookie.expires)) return false;
   if (cookie.key.startsWith('__Secure-')) {
     if (!cookie.isHttps || !cookie.secure) {
       return false;

@@ -1,5 +1,5 @@
-import { describe, test, expect } from 'vitest';
 import { URL } from 'node:url';
+import { describe, expect, test } from 'vitest';
 import { parseCookie } from './parse-cookie';
 
 describe('parseCookie', () => {
@@ -33,10 +33,9 @@ describe('parseCookie', () => {
     expect(cookies[11]).toMatchObject({ key: '11', value: 'e' });
   });
   test('Max-Age takes precedence over Expires', () => {
-    const cookies = [
-      '0=0; Max-Age=50; Expires=Wed, 21 Oct 2015 07:28:00 GMT',
-      '1=0; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Max-Age=50',
-    ].map((str) => parseCookie(exampleUrl, str));
+    const cookies = ['0=0; Max-Age=50; Expires=Wed, 21 Oct 2015 07:28:00 GMT', '1=0; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Max-Age=50'].map((str) =>
+      parseCookie(exampleUrl, str),
+    );
     expect(cookies[0].expires).toBeGreaterThan(Date.now());
     expect(cookies[1].expires).toBeGreaterThan(Date.now());
   });

@@ -1,3 +1,2 @@
-export { httpsRequest } from './https-request';
-export { makeCookie } from './cookies/make-cookie';
+export { request } from './request';
 export { CookieJar } from './cookies/CookieJar';

@@ -1,4 +1,5 @@
 import type { IncomingMessage } from 'node:http';
+import { errors } from './errors';
 
 export function isRedirect(status?: unknown): boolean {
   return typeof status === 'number' ? status >= 300 && status < 400 : false;
@@ -14,7 +15,6 @@ export function makeRedirectUrl(previous: URL, current: string): URL {
 
 export function getRedirectLocation(response: IncomingMessage): string {
   const locationHeader = response.headers.location;
-  if (!locationHeader)
-    throw new Error(`Redirect response (status: ${response.statusCode}) did not specify a location header`);
+  if (!locationHeader) throw new errors.ResponseInvalidRedirect(`Redirect response (status: ${response.statusCode}) did not specify a location header`);
   return locationHeader;
 }

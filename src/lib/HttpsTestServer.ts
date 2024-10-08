@@ -1,6 +1,6 @@
+import type * as http from 'node:http';
 import * as https from 'node:https';
-import * as http from 'node:http';
-import { Duplex } from 'node:stream';
+import type { Duplex } from 'node:stream';
 type HttpMethod = 'GET' | 'POST';
 type Unsubscribe = () => void;
 
@@ -76,7 +76,7 @@ export class HttpsTestServer {
     port?: number;
     key?: string;
     cert?: string;
-  }) {
+  } = {}) {
     this.throwOnUnhandled = throwOnUnhandled;
     this.throwOnDuplicateHandler = throwOnDuplicateHandler;
     this.port = port;

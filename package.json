@@ -1,22 +1,18 @@
 {
   "name": "@kksiuda/https-request",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "type": "module",
   "description": "Utility library for performing http(s) requests",
-  "main": "./dist/index.js",
+  "main": "./dist/request.js",
   "author": "Krzysztof Siuda",
   "license": "MIT",
   "private": false,
   "devDependencies": {
-    "@eslint/js": "^9.10.0",
-    "@types/eslint__js": "^8.42.3",
+    "@biomejs/biome": "^1.9.2",
     "@types/node": "^18.11.17",
-    "@typescript-eslint/eslint-plugin": "^8.6.0",
-    "@typescript-eslint/parser": "^8.6.0",
-    "eslint": "^9.10.0",
-    "prettier": "^2.8.1",
+    "@vitest/coverage-v8": "^2.1.1",
+    "rimraf": "^6.0.1",
     "typescript": "^4.9.5",
-    "typescript-eslint": "^8.6.0",
     "vitest": "^2.1.1"
   },
   "files": [
@@ -26,12 +22,12 @@
     "README.md"
   ],
   "scripts": {
-    "dist": "tsc",
-    "pre-build": "tsc --noEmit && eslint . && prettier --write . && vitest run",
+    "build": "rimraf ./dist && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "check": "tsc --noEmit && biome check --fix && vitest run",
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@vitest/coverage-v8": "^2.1.1"
+    "std-util": "^0.2.3"
   }
 }

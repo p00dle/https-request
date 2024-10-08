@@ -1,14 +1,14 @@
 import type { IncomingMessage } from 'node:http';
 import type { RequestOptions } from 'node:https';
-import type { URL } from 'node:url';
+import { request as defaultNodeRequest } from 'node:https';
 import type { Readable } from 'node:stream';
-
-import { request as httpsRequest } from 'node:https';
 import { pipeline } from 'node:stream';
+import type { URL } from 'node:url';
+import type { NodeRequest } from './types/NodeRequest';
 
-export function nodeHttpsRequestWrapper(url: URL, options: RequestOptions, dataStream: Readable) {
+export function asyncNodeRequest(url: URL, options: RequestOptions, requestDataStream: Readable, nodeRequest: NodeRequest = defaultNodeRequest) {
   return new Promise<IncomingMessage>((resolve, reject) => {
-    const request = httpsRequest(url, options, resolveWrapper);
+    const request = nodeRequest(url, options, resolveWrapper);
     let settled = false;
     function resolveWrapper(response: IncomingMessage) {
       if (settled) return;
@@ -25,6 +25,6 @@ export function nodeHttpsRequestWrapper(url: URL, options: RequestOptions, dataS
     }
     request.on('error', rejectWrapper);
     request.on('timeout', () => rejectWrapper('Socket timed out'));
-    pipeline(dataStream, request, (err) => (err ? rejectWrapper(err) : null));
+    pipeline(requestDataStream, request, (err) => (err ? rejectWrapper(err) : null));
   });
 }

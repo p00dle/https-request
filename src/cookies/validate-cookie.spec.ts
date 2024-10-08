@@ -1,5 +1,5 @@
-import { describe, test, expect } from 'vitest';
 import { URL } from 'node:url';
+import { describe, expect, test } from 'vitest';
 import { parseCookie } from './parse-cookie';
 import { validateCookie } from './validate-cookie';
 

@@ -1,13 +1,15 @@
+import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'node:http';
 import type { URL } from 'node:url';
 import type { Cookie } from '../types/Cookie';
+import type { CookieJarType } from '../types/CookieJarType';
 
+import { makeCookie } from './make-cookie';
 import { parseCookie } from './parse-cookie';
-import { validateCookie } from './validate-cookie';
 import { selectCookieFactory } from './select-cookies';
-import { CookieJarType } from '../types/CookieJarType';
+import { validateCookie } from './validate-cookie';
 
 function stringifyCookie(cookie: Cookie): string {
-  return cookie.key + '=' + (cookie.value ? cookie.value : '');
+  return `${cookie.key}=${cookie.value ? cookie.value : ''}`;
 }
 
 export class CookieJar implements CookieJarType {
@@ -16,20 +18,22 @@ export class CookieJar implements CookieJarType {
     this.cookies = Array.isArray(cookies) ? cookies : [];
   }
 
-  public collectCookiesFromResponse(url: URL, response: { headers: { 'set-cookie'?: string[] } }) {
-    (response.headers['set-cookie'] || [])
-      .map((cookieStr) => parseCookie(url, cookieStr))
-      .filter((cookie) => validateCookie(url, cookie))
-      .forEach((cookie) => this.addCookie(cookie));
+  static makeCookie = makeCookie;
+
+  public collectCookiesFromResponse(url: URL, responseHeaders: IncomingHttpHeaders) {
+    const cookieHeader = responseHeaders['set-cookie'] ?? [];
+    const parsedCookies = cookieHeader.map((cookieStr) => parseCookie(url, cookieStr));
+    for (const cookie of parsedCookies.filter((cookie) => validateCookie(url, cookie))) {
+      this.addCookie(cookie);
+    }
   }
 
-  public applyRequestCookieHeader(url: URL, host: string, requestOptions: { headers?: { Cookie?: string } }): void {
+  public applyRequestCookieHeader(url: URL, host: string, requestHeaders: OutgoingHttpHeaders): void {
     this.expireCookies();
     const cookies = this.cookies.filter(selectCookieFactory(url, host));
     const cookieString = cookies.map(stringifyCookie).join(';');
-    if (!requestOptions.headers) requestOptions.headers = {};
-    if (requestOptions.headers.Cookie) requestOptions.headers.Cookie += ';' + cookieString;
-    else requestOptions.headers.Cookie = cookieString;
+    if (!requestHeaders.cookie) requestHeaders.cookie = '';
+    requestHeaders.cookie += `;${cookieString}`;
   }
 
   protected expireCookies() {
@@ -43,8 +47,7 @@ export class CookieJar implements CookieJarType {
 
   public addCookie(cookie: Cookie) {
     const existingCookieIndex = this.cookies.findIndex(
-      (c) =>
-        c.key === cookie.key && c.domain === cookie.domain && c.path === cookie.path && c.isHttps === cookie.isHttps
+      (c) => c.key === cookie.key && c.domain === cookie.domain && c.path === cookie.path && c.isHttps === cookie.isHttps,
     );
     if (existingCookieIndex >= 0) {
       this.cookies[existingCookieIndex] = cookie;
@@ -54,25 +57,19 @@ export class CookieJar implements CookieJarType {
   }
 
   public addCookies(cookies: Cookie[]) {
-    cookies.forEach((cookie) => this.addCookie(cookie));
+    for (const cookie of cookies) {
+      this.addCookie(cookie);
+    }
   }
 
   public removeCookies({ key, domain, path }: { key?: string; domain?: string; path?: string }) {
     this.cookies = this.cookies.filter(
-      (cookie) =>
-        !(
-          (key ? cookie.key === key : true) &&
-          (domain ? cookie.domain === domain : true) &&
-          (path ? cookie.path === path : true)
-        )
+      (cookie) => !((key ? cookie.key === key : true) && (domain ? cookie.domain === domain : true) && (path ? cookie.path === path : true)),
     );
   }
 
   public getCookie(key: string, domain?: string, path?: string): Cookie | null {
-    const cookie = this.cookies.find(
-      (cookie) =>
-        cookie.key === key && (domain ? cookie.domain === domain : true) && (path ? cookie.path === path : true)
-    );
+    const cookie = this.cookies.find((cookie) => cookie.key === key && (domain ? cookie.domain === domain : true) && (path ? cookie.path === path : true));
     return cookie ? cookie : null;
   }
   public getRequestCookies(url: URL, host: string): string[] {
