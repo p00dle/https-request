@@ -3,65 +3,49 @@ import type { Readable } from 'node:stream';
 import type { IncomingMessage } from 'node:http';
 import { collectStreamToBuffer, collectStreamToString } from 'std-util';
 import { errors } from './errors';
-import type { InferredResponseBodyType } from './types/InferredResponseBodyType';
+import type { InferredParsedResponseBodyType, InferredResponseBodyType } from './types/InferredResponseBodyType';
 import type { ResponseBodyType } from './types/ResponseBodyType';
 
-export function parseResponse<T extends ResponseBodyType, P = never, V = never>(
+export async function parseResponse<T extends ResponseBodyType, P = never, V extends P = never>(
   responseStream: Readable,
   response: IncomingMessage,
   responseBodyType?: ResponseBodyType,
-  jsonParser?: (str: string) => P,
-  jsonValidator?: (val: unknown) => val is V,
-): Promise<InferredResponseBodyType<T, P, V>> {
+  parser?: (val: InferredResponseBodyType<T>) => P,
+  validator?: (val: P) => val is V,
+): Promise<InferredParsedResponseBodyType<T, P, V>> {
+  const body = await getBody(responseStream, response, responseBodyType);
+  const parsed = parseBody(body, responseBodyType, parser as (val: unknown) => unknown);
+  if (validator && !validator(parsed)) throw new errors.ResponseInvalidJson('Response does not conform to validation');
+  return parsed;
+}
+
+async function getBody(responseStream: Readable, response: IncomingMessage, responseBodyType?: ResponseBodyType) {
   switch (responseBodyType) {
     case 'binary':
-      return collectStreamToBuffer(responseStream) as Promise<InferredResponseBodyType<T, P, V>>;
-    case 'string':
-      return collectStreamToString(responseStream) as Promise<InferredResponseBodyType<T, P, V>>;
+      return collectStreamToBuffer(responseStream);
     case 'json':
-      return parseJson(responseStream, jsonParser, jsonValidator) as Promise<InferredResponseBodyType<T, P, V>>;
-    case 'raw':
-      return response as unknown as Promise<InferredResponseBodyType<T, P, V>>;
-    default:
-      return Promise.resolve(responseStream) as Promise<InferredResponseBodyType<T, P, V>>;
-  }
-}
-
-async function parseJson(stream: Readable, parser: (str: string) => unknown = JSON.parse, validator: (val: unknown) => boolean = () => true) {
-  const jsonString = await collectStreamToString(stream);
-  let json: unknown;
-  try {
-    json = parser(jsonString);
-  } catch (err) {
-    throw new errors.ResponseInvalidJson(
-      typeof err === 'object' && err !== null && 'message' in err && typeof err.message === 'string' ? err.message : 'Invalid response JSON',
-    );
-  }
-  if (!validator(json)) {
-    throw new errors.ResponseInvalidJson('Response JSON does not conform to validation');
-  }
-  return json;
-}
-
-/*
-  switch (options.responseBodyType) {
-    case 'binary':
-      return (await collectStreamToBuffer(responseDataStream)) as InferredResponseBodyType<O>;
     case 'string':
-      return (await collectStreamToString(responseDataStream)) as HttpsResponseData<R, J>, response];
-    case 'json': {
-      const jsonString = await collectStreamToString(dataStream);
-      const json = JSON.parse(jsonString);
-      if (combinedOptions.validateJson && !combinedOptions.validateJson(json)) {
-        throw new Error(`Received JSON does not conform to requirements`);
-      }
-      return json;
-    }
-    case undefined:
-    case 'stream':
-      return [dataStream as HttpsResponseData<R, J>, response];
+    case 'html':
+      return collectStreamToString(responseStream);
+    case 'raw':
+      return response;
     default:
-      throw new Error(`Invalid response type ${combinedOptions.responseType}`);
+      return Promise.resolve(responseStream);
   }
+}
 
-*/
+function parseBody(body: string | Readable | Buffer, responseBodyType?: ResponseBodyType, parser?: (val: unknown) => unknown) {
+  if (parser) {
+    return parser(body);
+  }
+  if (responseBodyType === 'json') {
+    try {
+      return JSON.parse(body as string);
+    } catch (err) {
+      throw new errors.ResponseInvalidJson(
+        typeof err === 'object' && err !== null && 'message' in err && typeof err.message === 'string' ? err.message : 'Invalid response JSON',
+      );
+    }
+  }
+  return body;
+}

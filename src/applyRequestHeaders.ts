@@ -1,5 +1,6 @@
 import type { OutgoingHttpHeaders } from 'node:http';
 import { applyHeader } from './lib/applyHeader';
+import type { ResponseBodyType } from './types/ResponseBodyType';
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation/List_of_default_Accept_values
 const DEFAULT_ACCEPT_HEADER =
@@ -9,6 +10,7 @@ export function applyRequestHeaders(
   contentLength: number,
   contentType: string,
   disableDecompression?: boolean,
+  responseBodyType?: ResponseBodyType,
   headers: OutgoingHttpHeaders = {},
 ): OutgoingHttpHeaders {
   if (contentLength >= 0) {
@@ -20,6 +22,12 @@ export function applyRequestHeaders(
   if (!disableDecompression) {
     applyHeader(headers, 'accept-encoding', 'br, gzip, compress, deflate', false);
   }
-  applyHeader(headers, 'accept', DEFAULT_ACCEPT_HEADER, false);
+  if (responseBodyType === 'json') {
+    applyHeader(headers, 'accept', 'application/json', false);
+  } else if (responseBodyType === 'html') {
+    applyHeader(headers, 'accept', 'text/html', false);
+  } else {
+    applyHeader(headers, 'accept', DEFAULT_ACCEPT_HEADER, false);
+  }
   return headers;
 }

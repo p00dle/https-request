@@ -4,11 +4,12 @@ import type { CookieJarType } from './CookieJarType';
 import type { HttpMethod } from './HttpMethod';
 import type { HttpStatusCodeValidation } from './HttpStatusCodeValidation';
 import type { InferredRequestBodyType } from './InferredRequestBodyType';
+import type { InferredResponseBodyType } from './InferredResponseBodyType';
 import type { ReferrerPolicy } from './ReferrerPolicy';
 import type { RequestBodyType } from './RequestBodyType';
 import type { ResponseBodyType } from './ResponseBodyType';
 
-export interface RequestParams<I extends RequestBodyType, O extends ResponseBodyType, P, V> {
+export interface RequestParams<I extends RequestBodyType, O extends ResponseBodyType, P, V extends P> {
   url: string | URL;
   method?: HttpMethod;
   maxRedirects?: number;
@@ -20,8 +21,8 @@ export interface RequestParams<I extends RequestBodyType, O extends ResponseBody
   bodyType?: I;
   body?: InferredRequestBodyType<I>;
   responseBodyType?: O;
-  parseJson?: (str: string) => P;
-  validateJson?: (val: unknown) => val is V;
+  parseResponse?: (val: InferredResponseBodyType<O>) => P;
+  validateResponse?: (val: P) => val is V;
   _nodeRequest?: typeof NodeRequest;
   nodeOptions?: NodeRequestParams;
   onResponseBodyLength?: (size: number) => unknown;

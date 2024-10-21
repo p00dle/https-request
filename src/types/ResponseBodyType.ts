@@ -1,1 +1,1 @@
-export type ResponseBodyType = 'binary' | 'json' | 'string' | 'stream' | 'raw';
+export type ResponseBodyType = 'binary' | 'json' | 'string' | 'stream' | 'raw' | 'html';
