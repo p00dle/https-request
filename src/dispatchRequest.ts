@@ -13,7 +13,7 @@ import type { ResponseBodyType } from './types/ResponseBodyType';
 
 export async function dispatchRequest(
   url: string | URL,
-  options: RequestParams<RequestBodyType, ResponseBodyType, unknown, unknown>,
+  options: RequestParams<RequestBodyType, ResponseBodyType, unknown>,
   requestDataStream: Readable,
   requestHeaders: OutgoingHttpHeaders,
 ): Promise<IncomingMessage> {

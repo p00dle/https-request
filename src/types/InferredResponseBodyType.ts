@@ -10,8 +10,4 @@ export type InferredResponseBodyType<T extends ResponseBodyType | undefined> = T
       ? IncomingMessage
       : Readable;
 
-export type InferredParsedResponseBodyType<T extends ResponseBodyType | undefined, P, V> = V extends unknown
-  ? P extends unknown
-    ? InferredResponseBodyType<T>
-    : P
-  : V;
+export type InferredParsedResponseBodyType<T extends ResponseBodyType | undefined, P> = P extends undefined ? InferredResponseBodyType<T> : P;

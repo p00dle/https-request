@@ -6,13 +6,13 @@ import { errors } from './errors';
 import type { InferredParsedResponseBodyType, InferredResponseBodyType } from './types/InferredResponseBodyType';
 import type { ResponseBodyType } from './types/ResponseBodyType';
 
-export async function parseResponse<T extends ResponseBodyType, P = never, V extends P = never>(
+export async function parseResponse<T extends ResponseBodyType, P = undefined>(
   responseStream: Readable,
   response: IncomingMessage,
   responseBodyType?: ResponseBodyType,
   parser?: (val: InferredResponseBodyType<T>) => P,
-  validator?: (val: P) => val is V,
-): Promise<InferredParsedResponseBodyType<T, P, V>> {
+  validator?: (val: P) => boolean,
+): Promise<InferredParsedResponseBodyType<T, P>> {
   const body = await getBody(responseStream, response, responseBodyType);
   const parsed = parseBody(body, responseBodyType, parser as (val: unknown) => unknown);
   if (validator && !validator(parsed)) throw new errors.ResponseInvalidJson('Response does not conform to validation');

@@ -8,7 +8,7 @@ import type { RequestParams } from './types/RequestParams';
 import type { ResponseBodyType } from './types/ResponseBodyType';
 
 export function transformOptions(
-  options: RequestParams<RequestBodyType, ResponseBodyType, unknown, unknown>,
+  options: RequestParams<RequestBodyType, ResponseBodyType, unknown>,
   requestHeaders: OutgoingHttpHeaders,
 ): {
   maxRedirects: number;
@@ -25,7 +25,7 @@ export function transformOptions(
 }
 
 function transformNodeOptions(
-  options: RequestParams<RequestBodyType, ResponseBodyType, unknown, unknown>,
+  options: RequestParams<RequestBodyType, ResponseBodyType, unknown>,
   headers: OutgoingHttpHeaders,
 ): NodeRequestParams & { headers: OutgoingHttpHeaders } {
   const output = {

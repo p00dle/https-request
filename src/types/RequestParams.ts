@@ -9,7 +9,7 @@ import type { ReferrerPolicy } from './ReferrerPolicy';
 import type { RequestBodyType } from './RequestBodyType';
 import type { ResponseBodyType } from './ResponseBodyType';
 
-export interface RequestParams<I extends RequestBodyType, O extends ResponseBodyType, P, V extends P> {
+export interface RequestParams<I extends RequestBodyType, O extends ResponseBodyType, P> {
   url: string | URL;
   method?: HttpMethod;
   maxRedirects?: number;
@@ -22,7 +22,7 @@ export interface RequestParams<I extends RequestBodyType, O extends ResponseBody
   body?: InferredRequestBodyType<I>;
   responseBodyType?: O;
   parseResponse?: (val: InferredResponseBodyType<O>) => P;
-  validateResponse?: (val: P) => val is V;
+  validateResponse?: (val: P) => boolean;
   _nodeRequest?: typeof NodeRequest;
   nodeOptions?: NodeRequestParams;
   onResponseBodyLength?: (size: number) => unknown;
