@@ -1,4 +1,4 @@
-import type { OutgoingHttpHeaders } from 'node:http';
+import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'node:http';
 import type { request as NodeRequest, RequestOptions as NodeRequestParams } from 'node:https';
 import type { CookieJarType } from './CookieJarType';
 import type { HttpMethod } from './HttpMethod';
@@ -29,6 +29,7 @@ export interface RequestParams<I extends RequestBodyType, O extends ResponseBody
   onResponseDataChunk?: (size: number) => unknown;
   onRequestBodyLength?: (size: number) => unknown;
   onRequestDataChunk?: (size: number) => unknown;
+  onResponseHeaders?: (headers: IncomingHttpHeaders) => unknown;
   abortSignal?: AbortSignal;
   disableDecompression?: boolean;
 }

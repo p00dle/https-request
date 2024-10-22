@@ -1,6 +1,6 @@
 {
   "name": "@kksiuda/https-request",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "description": "Utility library for performing http(s) requests",
   "main": "./dist/cjs/index.js",

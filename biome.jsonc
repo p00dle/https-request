@@ -3,18 +3,21 @@
   "formatter": {
     "indentStyle": "space",
     "lineWidth": 160,
-    "indentWidth": 2
+    "indentWidth": 2,
+    "lineEnding": "lf"
   },
   "linter": {
     "rules": {}
   },
+  "organizeImports": {
+    "enabled": true
+  },
   "javascript": {
     "formatter": {
-      "quoteStyle": "single",
-      "lineWidth": 160
+      "quoteStyle": "single"
     }
   },
   "files": {
-    "include": ["src/**/*.ts", "build/*"]
+    "include": ["src/**/*.ts", "build/**/*.js"]
   }
 }

@@ -21,7 +21,7 @@ describe('request', () => {
       res.setHeader('Transfer-Encoding', 'chunked');
       res.end(MESSAGE);
     });
-    const { data, headers } = await request({
+    const data = await request({
       url: path.client,
       responseBodyType: 'string',
       nodeOptions: { rejectUnauthorized: false },
