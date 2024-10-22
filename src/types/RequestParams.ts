@@ -8,12 +8,14 @@ import type { InferredResponseBodyType } from './InferredResponseBodyType';
 import type { ReferrerPolicy } from './ReferrerPolicy';
 import type { RequestBodyType } from './RequestBodyType';
 import type { ResponseBodyType } from './ResponseBodyType';
+import type { UserAgent } from './UserAgent';
 
 export interface RequestParams<I extends RequestBodyType, O extends ResponseBodyType, P> {
   url: string | URL;
   method?: HttpMethod;
   maxRedirects?: number;
   cookieJar?: CookieJarType;
+  userAgent?: UserAgent;
   headers?: OutgoingHttpHeaders;
   baseUrl?: string | URL;
   validateResponseStatus?: HttpStatusCodeValidation;

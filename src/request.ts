@@ -17,7 +17,7 @@ export async function request<I extends RequestBodyType, O extends ResponseBodyT
 ): Promise<InferredParsedResponseBodyType<O, P>> {
   const { url, requestDataStream, contentType, contentLength } = formatRequestData(options.url, options.method, options.bodyType, options.body);
   const wrappedRequestDataStream = applyReports(requestDataStream, contentLength, options.onRequestBodyLength, options.onRequestDataChunk);
-  const headers = applyRequestHeaders(contentLength, contentType, options.disableDecompression, options.responseBodyType, options.headers);
+  const headers = applyRequestHeaders(contentLength, contentType, options.disableDecompression, options.responseBodyType, options.userAgent, options.headers);
   const response = await dispatchRequest(url, options as RequestParams<RequestBodyType, ResponseBodyType, unknown>, wrappedRequestDataStream, headers);
   validateResponseStatus(options.validateResponseStatus, response.statusCode);
   if (options.onResponseHeaders) options.onResponseHeaders(response.headers);
